@@ -3,7 +3,7 @@ dotenv.config()
 
 // Configuration for the app, taken from the environment variables
 const config = {
-    MONGO_URI: process.env.MONGO_URI || "mongodb://localhost:27017/test",
+    MONGO_URI: process.env.MONGO_URI || "mongodb://user:password@localhost:27017/deposits",
     PORT: process.env.PORT || 3000,
     
     
