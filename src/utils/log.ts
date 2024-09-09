@@ -1,12 +1,13 @@
 import { createLogger, format, transports } from "winston";
 import type { Logger } from "winston";
+import { type ILog } from "../types/types.classes";
 
 /**
  * @class Log
  * @description This class is used to initialize the logger
  * @returns Logger of type winston
  */
-class Log {
+class Log implements ILog {
   private readonly logger: Logger;
 
   constructor() {
@@ -52,8 +53,8 @@ class Log {
    * @param {string} message
    * @returns void
    */
-  public error(message: string) {
-    this.logger.error(message);
+  public error(error: any) {
+    this.logger.error(error);
   }
 }
 
