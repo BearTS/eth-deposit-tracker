@@ -36,7 +36,7 @@ export class DepositRepository implements IDepositsRepository {
         } catch (error) {
             if (error.code === DuplicateErrorCode) {
                 log.error(this.service, `Duplicate key error: ${error.keyValue}`);
-                throw new Error("Duplicate key error");
+                return null;
             }
             log.error(this.service, error);
             throw new Error(error);

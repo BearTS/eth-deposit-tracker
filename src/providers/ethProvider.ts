@@ -1,4 +1,5 @@
-import { ethers } from "ethers";
+import { ethers, TransactionResponse } from "ethers";
+import { ILog } from "../types/log";
 
 /**
  * @interface IEthereumConfig
@@ -15,9 +16,12 @@ interface IEthereumConfig {
  */
 export class EthereumProvider {
     private provider: ethers.JsonRpcProvider;
+    private log: ILog;
+    private service: string = "Ethereum Provider";
 
-    constructor(config: IEthereumConfig) {
+    constructor(config: IEthereumConfig, log: ILog) {
         this.provider = new ethers.JsonRpcProvider(config.rpcUrl);
+        this.log = log;
     }
 
     /**
@@ -40,7 +44,39 @@ export class EthereumProvider {
         return await this.provider.getBlock(blockNumber);
     }
 
+    /**
+     * 
+     * @method getBlockNumber
+     * @description This function is used to get the block number
+     * @returns block number
+     */
     public async getBlockNumber(): Promise<number> {
         return await this.provider.getBlockNumber();
+    }
+
+    public async getBlockTransactions(blockNumber: number): Promise<TransactionResponse[] | null> {
+        const txns: TransactionResponse[] = [];
+        const block = await this.provider.getBlock(blockNumber);
+
+        if (!block) {
+            this.log.info(this.service, "Block not found");
+            return;
+        }
+
+        this.log.info(this.service, `Processing block ${blockNumber}`);
+        for (const txnHash of block.transactions) {
+            const tx = await this.provider.getTransaction(txnHash);
+            if (tx) {
+                txns.push(tx);
+            }
+        }
+
+        return txns.length > 0 ? txns : null;
+    }
+
+    public async watchNewBlocks(callback: (blockNumber: number) => void): Promise<void> {
+        this.provider.on("block", async (blockNumber) => {
+            callback(blockNumber);
+        });
     }
 }

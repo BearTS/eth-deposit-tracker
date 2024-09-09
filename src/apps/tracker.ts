@@ -2,6 +2,8 @@ import { INotify } from './../types/notify.d';
 import { IDepositsRepository } from '../types/repositories';
 import { IEthProvider } from '../types/ethProvider';
 import { ILog } from '../types/log';
+import { TransactionResponse } from 'ethers';
+import { Deposit, DepositSchema } from '../schemas/deposit';
 
 
 export class DepositsTracker {
@@ -11,25 +13,73 @@ export class DepositsTracker {
     private service: string = "Deposits Tracker";
     private log: ILog;
     
-    constructor(notify: INotify, logger: ILog, ethProvider: IEthProvider, depositRepo?: IDepositsRepository) {
+    constructor(notify: INotify, logger: ILog, ethProvider: IEthProvider, depositRepo: IDepositsRepository) {
         this.notifier = notify;
         this.ethProvider = ethProvider;
         this.depositRepo = depositRepo;
         this.log = logger;
 
-        this.notifier.notify("Deposits Tracker started", this.service);
+        // Notify the user that the tracker has started
+        this.notifier.notify(this.service, "Deposits Tracker started");
     }
 
-    public async trackBlockTransactions(blockNumber: number): Promise<void> {
-        const deposit = await this.depositRepo.getLastStoredDeposit()
-        const lastStoredBlock = deposit ? deposit.blockNumber : blockNumber;
-        this.log.info(this.service, `Last stored block: ${lastStoredBlock}`);
+    /**
+     * @method startNewBlocksListener
+     * @description This function is used to start listening for new blocks
+     * @returns void
+     */
+    public startNewBlocksListener(): void {
+        this.ethProvider.watchNewBlocks((blockNumber: number) => {
+            this.processBlock(blockNumber); 
+        });
+    }
 
-        let latestBlock = await this.ethProvider.getBlockNumber();
+    /**
+     * @method processBlock
+     * @description This function is used to process a block
+     * @param blockNumber block number
+     */
+    public async processBlock(blockNumber: number): Promise<void> {
+        try {
+            const txns = await this.ethProvider.getBlockTransactions(blockNumber);
 
-        for (let i = lastStoredBlock; i <= latestBlock; i++) {
-            const block = await this.ethProvider.getBlock(i);
-            this.log.info(this.service, `Processing block: ${block.baseFeePerGas}`);
+            let msg = `Processed block ${blockNumber} with ${txns.length} transactions`;
+            for(const tx of txns) {
+                await this.saveTransaction(tx);
+                msg += `\nSaved transaction ${tx.hash} from ${tx.from} with fee ${tx.gasPrice * tx.gasPrice}`;
+            }
+
+            this.notifier.notify(this.service, msg);
+        } catch (err: any) {
+            this.log.error(this.service + " [processBlock]", err.message);
+            await this.notifier.notify(this.service, "Error processing block " + blockNumber);
         }
+    }
+
+
+    /**
+     * @method saveTransaction
+     * @description This function is used to save a transaction to the database and notify the user
+     * @param tx the transaction to be saved
+     * @returns void
+     */
+    private async saveTransaction(tx: TransactionResponse): Promise<void> {
+       try {
+            const block = await this.ethProvider.getBlock(tx.blockNumber);
+
+            const depositRecord: Deposit = {
+                blockNumber: tx.blockNumber,
+                blockTimestamp: block.timestamp,
+                pubkey: tx.from,
+                hash: tx.hash,
+                fee: tx.gasPrice * tx.gasPrice
+            }
+            DepositSchema.parse(depositRecord);
+
+            await this.depositRepo.create(depositRecord);
+       } catch(err: any) {
+           this.log.error(this.service+" [saveTransaction]", err.message);
+           throw new Error(err);
+       }
     }
 }

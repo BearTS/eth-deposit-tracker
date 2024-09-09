@@ -1,3 +1,3 @@
 export interface INotify {
-    notify(message: string, service: string): Promise<void>;
+    notify(service:string, message: string): Promise<void>;
 }
