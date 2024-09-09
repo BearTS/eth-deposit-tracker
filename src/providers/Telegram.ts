@@ -1,6 +1,6 @@
 import { Telegraf } from "telegraf";
-import log from "../utils/log";
-import { type INotify } from "../types/types.classes";
+import log from "./logger";
+import { INotify } from "../types/notify";
 
 /**
  * @interface ITelegramConfig

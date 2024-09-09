@@ -1,26 +1,26 @@
 
 
 // Only for testing purposes
-// import { Telegram } from "./providers/Telegram";
+import { Telegram } from "./providers/telegram";
 import config from "./config";
-import log from "./utils/log"
+import log from "./providers/logger"
 import MongoDatabase from "./providers/mongoDB";
-import { DepositModel } from './models/schema';
+import { DepositModel } from './models/deposit';
 import { Deposit, DepositSchema } from "./schemas/deposit";
 
   // Create an instance of the Telegram class
-// const telegramNotifier = new Telegram({
-//     token: config.TELEGRAM_BOT_TOKEN,
-//     chatId: config.TELEGRAM_CHAT_ID
-//   });  
+const telegramNotifier = new Telegram({
+    token: config.TELEGRAM_BOT_TOKEN,
+    chatId: config.TELEGRAM_CHAT_ID
+  });  
 
-// // Notify a message
+// Notify a message
 
-// telegramNotifier.notify("Hello, World!").then(() => {
-//     log.info("Message sent to Telegram");
-// }).catch((error) => {
-//     log.error(error);
-// })
+telegramNotifier.notify("Hello, World!").then(() => {
+    log.info("Message sent to Telegram");
+}).catch((error) => {
+    log.error(error);
+})
 
 // Create an instance of the MongoDB class
 const mongoDatabase = new MongoDatabase({
