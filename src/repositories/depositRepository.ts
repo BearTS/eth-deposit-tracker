@@ -14,6 +14,7 @@ const DuplicateErrorCode = 11000;
  */
 export class DepositRepository implements IDepositsRepository {
     private model: Model<Deposit>;
+    private service: string = "Deposit Repository";
 
     constructor(model: Model<Deposit>) {
         this.model = model;
@@ -34,10 +35,10 @@ export class DepositRepository implements IDepositsRepository {
             return await newRecord.save();
         } catch (error) {
             if (error.code === DuplicateErrorCode) {
-                log.error(`Duplicate key error: ${error.keyValue}`);
+                log.error(this.service, `Duplicate key error: ${error.keyValue}`);
                 throw new Error("Duplicate key error");
             }
-            log.error(error);
+            log.error(this.service, error);
             throw new Error(error);
         }
     }
@@ -55,5 +56,10 @@ export class DepositRepository implements IDepositsRepository {
     public async getAll(): Promise<Deposit[]> { 
         const deposits = await this.model.find().exec();
         return deposits;
+    }
+
+    public async getLastStoredDeposit(): Promise<Deposit | null> {
+        const deposit = await this.model.findOne().sort({ blockNumber: -1 }).exec();
+        return deposit ? deposit : null;
     }
 }

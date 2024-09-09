@@ -19,17 +19,19 @@ interface ITelegramConfig {
 export class Telegram implements INotify {
   private client: Telegraf;
   private chatId: string;
+  private service: string = "Telegram Notification";
 
   constructor(config: ITelegramConfig) {
     this.chatId = config.chatId;
     this.client = new Telegraf(config.token);
   }
-  public async notify(message: string): Promise<void> {
+  public async notify(message: string, service: string): Promise<void> {
     try {
+      message = `[${service}] ${message}`;
       await this.client.telegram.sendMessage(this.chatId, message);
-      log.info("Message sent to Telegram");
+      log.info(this.service, "Message sent to Telegram");
     } catch (error) {
-      log.error(error);
+      log.error(this.service, error);
     }
   }
 }

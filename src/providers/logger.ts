@@ -43,7 +43,8 @@ class Log implements ILog {
    * @param {string} message
    * @returns void
    */
-  public info(message: string) {
+  public info(service: string, message: string) {
+    message = `[${service}] ${message}`;
     this.logger.info(message);
   }
 
@@ -53,7 +54,8 @@ class Log implements ILog {
    * @param {string} message
    * @returns void
    */
-  public error(error: any) {
+  public error(service: string, error: any) {
+    error = `[${service}] ${error}`;
     this.logger.error(error);
   }
 }

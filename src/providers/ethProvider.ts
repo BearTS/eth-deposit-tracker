@@ -23,7 +23,7 @@ export class EthereumProvider {
     /**
      * @method getTransaction
      * @description This function is used to get a transaction
-     * @param txHash: string
+     * @param txHash transaction hash
      * @returns ethers.TransactionResponse
      */
     public async getTransaction(txHash: string): Promise<ethers.TransactionResponse | null>  {
@@ -33,10 +33,14 @@ export class EthereumProvider {
     /**
      * @method getBlock
      * @description This function is used to get a block
-     * @param blockNumber: number
+     * @param blockNumber block number
      * @returns ethers.Block
      */
     public async getBlock(blockNumber: number): Promise<ethers.Block | null>  {
         return await this.provider.getBlock(blockNumber);
+    }
+
+    public async getBlockNumber(): Promise<number> {
+        return await this.provider.getBlockNumber();
     }
 }

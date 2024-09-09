@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { MongooseOptions } from "mongoose";
 import log from "./logger";
 
 interface IMongoConfig {
@@ -11,7 +11,7 @@ interface IMongoConfig {
  */
 export class MongoDatabase {
     private uri: string;
-
+    private service: string = "MongoDB";
     constructor(config: IMongoConfig) {
         this.uri = config.uri;
     }
@@ -24,14 +24,14 @@ export class MongoDatabase {
     mongoose.connect(this.uri);
         
     mongoose.connection.on("error", (err: any) => {
-        log.error('MongoDB connection error: ' + err);
-      process.exit();
+        log.error(this.service, 'MongoDB connection error: ' + err);
+        process.exit();
     });
     mongoose.connection.on("connected", () => {
-        log.info("Connected to MongoDB");
+        log.info(this.service, "Connected to MongoDB");
     });
     mongoose.connection.on("disconnected", () => {
-        log.info("Disconnected from MongoDB");
+        log.info(this.service, "Disconnected from MongoDB");
     });
   }
 }

@@ -12,4 +12,4 @@ const DepositSchema: Schema = new Schema({
     pubkey: { type: String, required: true }
 });
 
-export const DepositModel = mongoose.model<IDeposit>("Deposit", DepositSchema);
+export const DepositModel = mongoose.model<Deposit>("Deposit", DepositSchema);

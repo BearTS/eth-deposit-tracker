@@ -1,4 +1,4 @@
 export interface ILog {
-    info(message: string): void;
-    error(err: Error): void;
+    info(service: string, message: string): void;
+    error(service: string, err: Error): void;
 }
