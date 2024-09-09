@@ -1,54 +1,10 @@
-
-
-// Only for testing purposes
-import { Telegram } from "./providers/telegram";
+import { EthereumProvider } from "./providers/ethProvider";
 import config from "./config";
-import log from "./providers/logger"
-import MongoDatabase from "./providers/mongoDB";
-import { DepositModel } from './models/deposit';
-import { Deposit, DepositSchema } from "./schemas/deposit";
 
-  // Create an instance of the Telegram class
-const telegramNotifier = new Telegram({
-    token: config.TELEGRAM_BOT_TOKEN,
-    chatId: config.TELEGRAM_CHAT_ID
-  });  
+const txHash = "0x1ecad2874a871dd3ec8e58e653a8cf4a396c4f7f14e3f700acc710cacda83b7e"
 
-// Notify a message
+const ethProvider = new EthereumProvider({ rpcUrl: config.RPC_URL });
 
-telegramNotifier.notify("Hello, World!").then(() => {
-    log.info("Message sent to Telegram");
-}).catch((error) => {
-    log.error(error);
-})
-
-// Create an instance of the MongoDB class
-const mongoDatabase = new MongoDatabase({
-    uri: config.MONGO_URI
-  });
-
-// Initialize the database
-mongoDatabase.init();
-
-const deposit: Deposit = {
-    blockNumber: 1,
-    blockTimestamp: 1,
-    fee: BigInt(1),
-    hash: "hash",
-    pubkey: "pubkey"
-}
-
-async function saveDeposit(deposit: Deposit) {
-    DepositSchema.parse(deposit);
-
-    const depositModel = new DepositModel(deposit);
-
-    await depositModel.save();
-}
-
-
-saveDeposit(deposit).then(c => {
-  log.info("done")
-}).catch(e => {
-  log.error(e)
-})
+ethProvider.getTransaction(txHash).then((tx) => {
+    console.log(tx);
+});

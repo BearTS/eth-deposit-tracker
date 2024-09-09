@@ -5,11 +5,13 @@ dotenv.config()
 const config = {
     MONGO_URI: process.env.MONGO_URI || "mongodb://user:password@localhost:27017/deposits",
     PORT: process.env.PORT || 3000,
-    
-    
-    // Notification
+
+    // Telegram bot configuration
     TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN!,
-    TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID!
+    TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID!,
+
+    // Ethereum configuration
+    RPC_URL: process.env.RPC_URL!,
 }
 
 
