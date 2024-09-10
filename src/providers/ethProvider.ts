@@ -1,5 +1,5 @@
 import { ethers, TransactionResponse } from "ethers";
-import { ILog } from "../types/log";
+import { ILog } from "../interfaces/log";
 
 /**
  * @interface IEthereumConfig

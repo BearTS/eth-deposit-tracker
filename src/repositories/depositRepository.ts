@@ -1,5 +1,5 @@
 import { Deposit } from "../schemas/deposit";
-import { IDepositsRepository } from "../types/repositories";
+import { IDepositsRepository } from "../interfaces/repositories";
 import { Model } from "mongoose";
 import log from "../providers/logger";
 

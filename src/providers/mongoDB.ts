@@ -1,5 +1,5 @@
 import mongoose, { MongooseOptions } from "mongoose";
-import { ILog } from "../types/log";
+import { ILog } from "../interfaces/log";
 
 interface IMongoConfig {
   uri: string;

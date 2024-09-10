@@ -1,7 +1,7 @@
-import { INotify } from "./../types/notify.d";
-import { IDepositsRepository } from "../types/repositories";
-import { IEthProvider } from "../types/ethProvider";
-import { ILog } from "../types/log";
+import { INotify } from "../interfaces/notify.d";
+import { IDepositsRepository } from "../interfaces/repositories";
+import { IEthProvider } from "../interfaces/ethProvider";
+import { ILog } from "../interfaces/log";
 import { TransactionResponse } from "ethers";
 import { Deposit, DepositSchema } from "../schemas/deposit";
 

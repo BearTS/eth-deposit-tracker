@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from "winston";
 import type { Logger } from "winston";
-import { ILog } from "../types/log";
+import { ILog } from "../interfaces/log";
 
 /**
  * @class Log
