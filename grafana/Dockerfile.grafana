@@ -1,0 +1,6 @@
+FROM grafana/grafana:latest
+EXPOSE 3000
+COPY provisioning /etc/grafana/provisioning
+COPY provisioning/dashboards /var/lib/grafana/dashboards
+
+CMD ["/run.sh"]

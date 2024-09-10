@@ -19,12 +19,12 @@ services:
     build: .
     container_name: app
     ports:
-      - "3000:3000"
+      - "4000:4000"
     depends_on:
       - mongodb
     environment:
       - MONGO_URI=mongodb://user:password@mongodb:27017/deposits
-      - PORT=3000
+      - PORT=4000
       - NODE_ENV=production
     volumes:
       - ./logs:/app/logs
@@ -32,9 +32,37 @@ services:
       - .env
     networks:
       - default
+  
+  prometheus:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile.prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    depends_on:
+      - app
+    networks:
+      - default
+
+  grafana:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile.grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - default
 
 networks:
   default:
-  
+
 volumes:
   mongodb_data:
+  prometheus_data:
+  grafana_data:

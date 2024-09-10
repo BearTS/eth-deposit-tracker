@@ -53,8 +53,12 @@ export class DepositRepository implements IDepositsRepository {
     return this.model.findById(id).exec();
   }
 
-  public async getAll(): Promise<Deposit[]> {
-    const deposits = await this.model.find().exec();
+  public async getAll(blockTimestamp?: number): Promise<Deposit[]> {
+    const deposits = await this.model
+      .find({
+        blockTimestamp: blockTimestamp ? { $gte: blockTimestamp } : undefined,
+      })
+      .exec();
     return deposits;
   }
 

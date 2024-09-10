@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 10s # Default scrape interval, can be overridden by individual scrape configs
+  evaluation_interval: 10s # Evaluate rules every 15 seconds
+
+scrape_configs:
+  - job_name: 'deposits_metrics'
+    metrics_path: '/metrics' # Default metrics path, adjust if necessary
+    scheme: 'http'
+    static_configs:
+      - targets: ['app:4000']
+    scrape_interval: 30s # Scrape every 30 seconds

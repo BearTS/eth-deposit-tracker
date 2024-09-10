@@ -67,12 +67,20 @@ export class EthereumProvider {
       return;
     }
 
-    this.log.info(this.service, `Processing block ${blockNumber}`);
+    this.log.info(
+      this.service,
+      `Processing block ${blockNumber} with ${block.transactions.length} transactions`,
+    );
     for (const txnHash of block.transactions) {
       const tx = await this.provider.getTransaction(txnHash);
+      // TODO: Can utilize a queue here to process transactions in parallel
       if (tx) {
         txns.push(tx);
       }
+
+      // if (txns.length > 10) {
+      //  break;
+      // }
     }
 
     return txns.length > 0 ? txns : null;
