@@ -1,4 +1,4 @@
-import { createLogger, format, transports } from "winston";
+import { createLogger, format, level, transports } from "winston";
 import type { Logger } from "winston";
 import { ILog } from "../interfaces/log";
 import LokiTransport from "winston-loki";
@@ -75,4 +75,4 @@ class Log implements ILog {
   }
 }
 
-export default new Log();
+export default new Log("debug");

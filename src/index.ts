@@ -27,7 +27,7 @@ async function startApplication() {
 
     // Initialize Ethereum provider
     const ethProvider = new EthereumProvider(
-      { rpcUrl: config.RPC_URL },
+      { rpcUrl: config.RPC_URL, contractAddress: config.CONTRACT_ADDRESS },
       logger,
     );
 

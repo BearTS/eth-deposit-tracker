@@ -7,6 +7,7 @@ import { ILog } from "../interfaces/log";
  */
 interface IEthereumConfig {
   rpcUrl: string;
+  contractAddress: string;
 }
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -29,10 +30,25 @@ export class EthereumProvider {
   private isQueueProcessing = false;
   private maxRetries = 10;
   private batchSize = 10;
+  private contract: ethers.Contract;
+  private contractAddress: string;
 
   constructor(config: IEthereumConfig, log: ILog) {
     this.provider = new ethers.JsonRpcProvider(config.rpcUrl);
     this.log = log;
+    this.contractAddress = config.contractAddress;
+
+    const depositABI = [
+      "event DepositEvent(bytes pubkey, bytes withdrawal_credentials, bytes amount, bytes signature, bytes index)",
+    ];
+
+    if (this.contractAddress) {
+      this.contract = new ethers.Contract(
+        this.contractAddress,
+        depositABI,
+        this.provider,
+      );
+    }
   }
 
   /**
@@ -45,6 +61,10 @@ export class EthereumProvider {
     txHash: string,
   ): Promise<ethers.TransactionResponse | null> {
     return this.enqueueCallback(() => this.provider.getTransaction(txHash));
+  }
+
+  public getProvider(): ethers.JsonRpcProvider {
+    return this.provider;
   }
 
   /**
@@ -108,6 +128,19 @@ export class EthereumProvider {
    */
   public watchNewBlocks(callback: (blockNumber: number) => void): void {
     this.provider.on("block", callback);
+  }
+
+  public watchContractEvents(
+    callback: (
+      pubkey: any,
+      withdrawal_credentials: any,
+      amount: any,
+      signature: any,
+      index: any,
+      event: any,
+    ) => void,
+  ): void {
+    this.contract.on("DepositEvent", callback);
   }
 
   /**

@@ -78,7 +78,6 @@ services:
     networks:
       - default
 
-
   grafana:
     build:
       context: ./grafana

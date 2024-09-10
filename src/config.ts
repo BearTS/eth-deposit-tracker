@@ -16,6 +16,7 @@ const config = {
   RPC_URL: process.env.RPC_URL!,
   FROM_ADDRESS: process.env.FROM_ADDRESS!,
   TO_ADDRESS: process.env.TO_ADDRESS!,
+  CONTRACT_ADDRESS: process.env.CONTRACT_ADDRESS!,
 };
 
 export default config;

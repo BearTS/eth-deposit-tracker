@@ -9,4 +9,16 @@ export interface IEthProvider {
   ): Promise<ethers.TransactionResponse[] | null>;
 
   watchNewBlocks(callback: (blockNumber: number) => void): void;
+  watchContractEvents(
+    callback: (
+      pubkey: any,
+      withdrawal_credentials: any,
+      amount: any,
+      signature: any,
+      index: any,
+      event: any,
+    ) => void,
+  ): void;
+
+  getProvider(): ethers.JsonRpcProvider;
 }
