@@ -1,5 +1,5 @@
 import mongoose, { MongooseOptions } from "mongoose";
-import log from "./logger";
+import { ILog } from "../types/log";
 
 interface IMongoConfig {
     uri: string;
@@ -11,9 +11,11 @@ interface IMongoConfig {
  */
 export class MongoDatabase {
     private uri: string;
+    private log: ILog;
     private service: string = "MongoDB";
-    constructor(config: IMongoConfig) {
+    constructor(config: IMongoConfig, log: ILog) {
         this.uri = config.uri;
+        this.log = log;
     }
   /**
    * @method init
@@ -24,14 +26,14 @@ export class MongoDatabase {
     mongoose.connect(this.uri);
         
     mongoose.connection.on("error", (err: any) => {
-        log.error(this.service, 'MongoDB connection error: ' + err);
+        this.log.error(this.service, new Error('MongoDB connection error: ' + err));
         process.exit();
     });
     mongoose.connection.on("connected", () => {
-        log.info(this.service, "Connected to MongoDB");
+        this.log.info(this.service, "Connected to MongoDB");
     });
     mongoose.connection.on("disconnected", () => {
-        log.info(this.service, "Disconnected from MongoDB");
+        this.log.info(this.service, "Disconnected from MongoDB");
     });
   }
 }

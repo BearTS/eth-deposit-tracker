@@ -12,12 +12,18 @@ export class DepositsTracker {
     private ethProvider: IEthProvider;
     private service: string = "Deposits Tracker";
     private log: ILog;
+    private from: string[] = [];
     
-    constructor(notify: INotify, logger: ILog, ethProvider: IEthProvider, depositRepo: IDepositsRepository) {
+    constructor(notify: INotify, logger: ILog, ethProvider: IEthProvider, depositRepo: IDepositsRepository, from?: string[]) {
         this.notifier = notify;
         this.ethProvider = ethProvider;
         this.depositRepo = depositRepo;
         this.log = logger;
+        if(from) this.from = from;
+
+        if (this.from.length) {
+            this.log.info(this.service, `Starting Deposits Tracker for the following addresses: ${this.from.join(", ")}`);
+        }
 
         // Notify the user that the tracker has started
         this.notifier.notify(this.service, "Deposits Tracker started");
@@ -42,9 +48,13 @@ export class DepositsTracker {
     public async processBlock(blockNumber: number): Promise<void> {
         try {
             const txns = await this.ethProvider.getBlockTransactions(blockNumber);
-
+            
             let msg = `Processed block ${blockNumber} with ${txns.length} transactions`;
             for(const tx of txns) {
+                if (this.from.length && !this.from.includes(tx.from)) {
+                    this.log.info(this.service, `Ignoring transaction ${tx.hash} from ${tx.from}`);
+                    continue;
+                }    
                 await this.saveTransaction(tx);
                 msg += `\nSaved transaction ${tx.hash} from ${tx.from} with fee ${tx.gasPrice * tx.gasPrice}`;
             }
@@ -78,8 +88,7 @@ export class DepositsTracker {
 
             await this.depositRepo.create(depositRecord);
        } catch(err: any) {
-           this.log.error(this.service+" [saveTransaction]", err.message);
-           throw new Error(err);
+           throw new Error("[saveTransaction] "+err.message);
        }
     }
 }
