@@ -8,5 +8,5 @@ export interface IEthProvider {
     blockNumberOrHash: string | number,
   ): Promise<ethers.TransactionResponse[] | null>;
 
-  watchNewBlocks(callback: (blockNumber: number) => void): Promise<void>;
+  watchNewBlocks(callback: (blockNumber: number) => void): void;
 }
