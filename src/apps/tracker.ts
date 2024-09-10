@@ -13,6 +13,7 @@ export class DepositsTracker implements IDepositTracker {
   private service: string = "Deposits Tracker";
   private log: ILog;
   private from: string[] = [];
+  private to: string[] = [];
 
   constructor(
     notify: INotify,
@@ -20,17 +21,25 @@ export class DepositsTracker implements IDepositTracker {
     ethProvider: IEthProvider,
     depositRepo: IDepositsRepository,
     from?: string[],
+    to?: string[],
   ) {
     this.notifier = notify;
     this.ethProvider = ethProvider;
     this.depositRepo = depositRepo;
     this.log = logger;
     if (from) this.from = from;
+    if (to) this.to = to;
 
     if (this.from.length) {
       this.log.info(
         this.service,
         `Starting Deposits Tracker for the following addresses: ${this.from.join(", ")}`,
+      );
+    }
+    if (this.to.length) {
+      this.log.info(
+        this.service,
+        `Starting Deposits Tracker for the following addresses: ${this.to.join(", ")}`,
       );
     }
 
@@ -72,6 +81,14 @@ export class DepositsTracker implements IDepositTracker {
           this.log.info(
             this.service,
             `Ignoring transaction ${tx.hash} from ${tx.from}`,
+          );
+          continue;
+        }
+
+        if (this.to.length && !this.to.includes(tx.to)) {
+          this.log.info(
+            this.service,
+            `Ignoring transaction ${tx.hash} to ${tx.to}`,
           );
           continue;
         }

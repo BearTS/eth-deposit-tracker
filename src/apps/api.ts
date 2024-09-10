@@ -51,12 +51,17 @@ export default class Express {
       if (config.FROM_ADDRESS) {
         from = config.FROM_ADDRESS.split(",");
       }
+      let to: string[] = [];
+      if (config.TO_ADDRESS) {
+        to = config.TO_ADDRESS.split(",");
+      }
       this.depositTracker = new DepositsTracker(
         this.notify,
         this.log,
         ethProvider,
         this.depositRepo,
         from,
+        to,
       );
     }
     this.createServer();
