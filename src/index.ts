@@ -7,28 +7,49 @@ import { DepositModel } from "./models/deposit";
 import MongoDatabase from "./providers/mongoDB";
 import logger from "./providers/logger";
 
-logger.info("Application", "Starting the application");
-const mongo = new MongoDatabase({ uri: config.MONGO_URI }, logger);
-mongo.init();
+async function startApplication() {
+  let from: string = [];
+  if (config.FROM_ADDRESS) {
+    from = config.FROM_ADDRESS.split(",");
+  }
+  logger.info("Application", "Starting the application");
+  try {
+    // Initialize Telegram notifier
+    const notify = new Telegram(
+      {
+        token: config.TELEGRAM_BOT_TOKEN,
+        chatId: config.TELEGRAM_CHAT_ID,
+      },
+      logger,
+    );
 
-const ethProvider = new EthereumProvider({ rpcUrl: config.RPC_URL }, logger);
+    // Initialize MongoDB
+    const db = new MongoDatabase({ uri: config.MONGO_URI }, logger);
+    await db.init();
+    const depositRepo = new DepositRepository(DepositModel);
 
-const notify = new Telegram(
-  {
-    token: config.TELEGRAM_BOT_TOKEN,
-    chatId: config.TELEGRAM_CHAT_ID,
-  },
-  logger,
-);
+    // Initialize Ethereum provider
+    const ethProvider = new EthereumProvider(
+      { rpcUrl: config.RPC_URL },
+      logger,
+    );
 
-const from = config.FROM_ADDRESS.split(",");
+    // Setup the deposit tracker
+    const deposTracker = new DepositsTracker(
+      notify,
+      logger,
+      ethProvider,
+      depositRepo,
+      from,
+    );
 
-const depositRepo = new DepositRepository(DepositModel);
-const deposTracker = new DepositsTracker(
-  notify,
-  logger,
-  ethProvider,
-  depositRepo,
-  from,
-);
-deposTracker.startNewBlocksListener();
+    // Start listening for new blocks
+    await deposTracker.startNewBlocksListener();
+  } catch (err) {
+    logger.error("Application", `Failed to start application: ${err.message}`);
+    process.exit(1); // Exit the process with an error code
+  }
+}
+
+// Start the application
+startApplication();

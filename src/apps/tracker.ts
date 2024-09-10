@@ -2,7 +2,7 @@ import { INotify } from "../interfaces/notify.d";
 import { IDepositsRepository } from "../interfaces/repositories";
 import { IEthProvider } from "../interfaces/ethProvider";
 import { ILog } from "../interfaces/log";
-import { TransactionResponse } from "ethers";
+import { TransactionResponse, Block } from "ethers";
 import { Deposit, DepositSchema } from "../schemas/deposit";
 
 export class DepositsTracker {
@@ -43,8 +43,15 @@ export class DepositsTracker {
    * @returns void
    */
   public startNewBlocksListener(): void {
-    this.ethProvider.watchNewBlocks((blockNumber: number) => {
-      this.processBlock(blockNumber);
+    this.ethProvider.watchNewBlocks(async (blockNumber: number) => {
+      try {
+        await this.processBlock(blockNumber);
+      } catch (error) {
+        this.log.error(
+          this.service + "[startNewBlocksListener]",
+          new Error(`Error processing block ${blockNumber}: ${error.message}`),
+        );
+      }
     });
   }
 
@@ -57,8 +64,9 @@ export class DepositsTracker {
   public async processBlock(blockNumber: number): Promise<void> {
     try {
       const txns = await this.ethProvider.getBlockTransactions(blockNumber);
-
-      let msg = `Processed block ${blockNumber} with ${txns.length} transactions`;
+      const block = await this.ethProvider.getBlock(blockNumber);
+      const batchSize = 10;
+      const batch = [];
       for (const tx of txns) {
         if (this.from.length && !this.from.includes(tx.from)) {
           this.log.info(
@@ -67,11 +75,18 @@ export class DepositsTracker {
           );
           continue;
         }
-        await this.saveTransaction(tx);
-        msg += `\nSaved transaction ${tx.hash} from ${tx.from} with fee ${tx.gasPrice * tx.gasPrice}`;
+
+        batch.push(tx);
+        if (batch.length >= batchSize) {
+          await this.processBatch(batch, block);
+          batch.length = 0; // Clear the batch
+        }
       }
 
-      this.notifier.notify(this.service, msg);
+      // Process any remaining transactions in the last batch
+      if (batch.length > 0) {
+        await this.processBatch(batch, block);
+      }
     } catch (err: any) {
       this.log.error(this.service + " [processBlock]", err.message);
       await this.notifier.notify(
@@ -81,16 +96,29 @@ export class DepositsTracker {
     }
   }
 
+  private async processBatch(
+    batch: TransactionResponse[],
+    block: Block,
+  ): Promise<void> {
+    let msg = `Processing batch of ${batch.length} transactions`;
+    for (const tx of batch) {
+      msg += `\nSuccessfully processed transaction ${tx.hash} from ${tx.from} with fee ${tx.gasPrice * tx.gasPrice}`;
+      await this.saveTransaction(tx, block);
+    }
+    await this.notifier.notify(this.service, msg);
+  }
+
   /**
    * @method saveTransaction
    * @description This function is used to save a transaction to the database and notify the user
    * @param tx the transaction to be saved
    * @returns void
    */
-  private async saveTransaction(tx: TransactionResponse): Promise<void> {
+  private async saveTransaction(
+    tx: TransactionResponse,
+    block: Block,
+  ): Promise<void> {
     try {
-      const block = await this.ethProvider.getBlock(tx.blockNumber);
-
       const depositRecord: Deposit = {
         blockNumber: tx.blockNumber,
         blockTimestamp: block.timestamp,
