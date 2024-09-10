@@ -28,7 +28,7 @@ export class DepositsTracker implements IDepositTracker {
     if (from) this.from = from;
 
     if (this.from.length) {
-      this.log.debug(
+      this.log.info(
         this.service,
         `Starting Deposits Tracker for the following addresses: ${this.from.join(", ")}`,
       );
@@ -127,6 +127,7 @@ export class DepositsTracker implements IDepositTracker {
     block: Block,
   ): Promise<void> {
     try {
+      this.log.info(this.service, `Saving transaction ${tx} to the database`);
       const depositRecord: Deposit = {
         blockNumber: tx.blockNumber,
         blockTimestamp: block.timestamp,

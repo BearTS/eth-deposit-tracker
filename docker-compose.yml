@@ -15,49 +15,73 @@ services:
     networks:
       - default
 
-  # app:
-  #   build: .
-  #   container_name: app
-  #   ports:
-  #     - "4000:4000"
-  #   depends_on:
-  #     - mongodb
-  #   environment:
-  #     - MONGO_URI=mongodb://user:password@mongodb:27017/deposits
-  #     - PORT=4000
-  #     - NODE_ENV=production
-  #   volumes:
-  #     - ./logs:/app/logs
-  #   env_file:
-  #     - .env
-  #   networks:
-  #     - default
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        - NODE_ENV=production
+        - NEXT_PUBLIC_BACKEND_URL=/api
+    container_name: client
+    environment:
+      - PORT=3001
+    networks:
+      - default
 
-  # prometheus:
-  #   build:
-  #     context: ./grafana
-  #     dockerfile: Dockerfile.prometheus
-  #   ports:
-  #     - "9090:9090"
-  #   volumes:
-  #     - prometheus_data:/prometheus
-  #   depends_on:
-  #     - app
-  #   networks:
-  #     - default
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - client
+      - app
+    networks:
+      - default
 
-  # grafana:
-  #   build:
-  #     context: ./grafana
-  #     dockerfile: Dockerfile.grafana
-  #   ports:
-  #     - "3000:3000"
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #   depends_on:
-  #     - prometheus
-  #   networks:
-  #     - default
+  app:
+    build: .
+    container_name: app
+    depends_on:
+      - mongodb
+    environment:
+      - MONGO_URI=mongodb://user:password@mongodb:27017/deposits
+      - PORT=4000
+      - NODE_ENV=production
+    volumes:
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    networks:
+      - default
+
+  prometheus:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile.prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+    depends_on:
+      - app
+    networks:
+      - default
+
+  grafana:
+    build:
+      context: ./grafana
+      dockerfile: Dockerfile.grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - default
 
 networks:
   default:

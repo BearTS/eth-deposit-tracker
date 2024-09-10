@@ -109,6 +109,7 @@ export default class Express {
   private mountRoutes(): void {
     const routes = new Routes(this.depositRepo);
     this.express.get("/metrics", routes.prometheusMetrics.bind(routes));
+    this.express.get("/deposits", routes.getAllDataPaginated.bind(routes));
   }
 }
 
@@ -142,6 +143,7 @@ class Routes {
     });
   }
 
+  // TODO: Utilize separate routes folder, can separate out logic for each route MVC style
   public async prometheusMetrics(req: express.Request, res: express.Response) {
     // current timestamp
     const fiveMinutesAgo = Math.floor((Date.now() - 5 * 60 * 1000) / 1000);
@@ -157,6 +159,21 @@ class Routes {
 
       res.set("Content-Type", this.registry.contentType);
       res.end(await this.registry.metrics());
+    } catch (error) {
+      res.status(500).json({ error: error, message: "Internal Server Error" });
+    }
+  }
+
+  public async getAllDataPaginated(
+    req: express.Request,
+    res: express.Response,
+  ) {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+
+    try {
+      const deposits = await this.depositRepo.getAllPaginated(page, limit);
+      res.status(200).json(deposits);
     } catch (error) {
       res.status(500).json({ error: error, message: "Internal Server Error" });
     }

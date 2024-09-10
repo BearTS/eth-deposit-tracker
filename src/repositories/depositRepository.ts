@@ -54,16 +54,49 @@ export class DepositRepository implements IDepositsRepository {
   }
 
   public async getAll(blockTimestamp?: number): Promise<Deposit[]> {
-    const deposits = await this.model
-      .find({
-        blockTimestamp: blockTimestamp ? { $gte: blockTimestamp } : undefined,
-      })
-      .exec();
-    return deposits;
+    try {
+      const deposits = await this.model
+        .find({
+          blockTimestamp: blockTimestamp ? { $gte: blockTimestamp } : undefined,
+        })
+        .exec();
+      return deposits;
+    } catch (error) {
+      log.error(this.service, error);
+      throw new Error(error);
+    }
   }
 
   public async getLastStoredDeposit(): Promise<Deposit | null> {
-    const deposit = await this.model.findOne().sort({ blockNumber: -1 }).exec();
-    return deposit ? deposit : null;
+    try {
+      const deposit = await this.model
+        .findOne()
+        .sort({ blockNumber: -1 })
+        .exec();
+      return deposit ? deposit : null;
+    } catch (error) {
+      log.error(this.service, error);
+      throw new Error(error);
+    }
+  }
+
+  // TODO: Change it to return the total number of deposits and pages
+  public async getAllPaginated(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<Deposit[]> {
+    try {
+      const deposits = await this.model
+        .find()
+        .sort({ blockTimestamp: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit)
+        .exec();
+
+      return deposits;
+    } catch (error) {
+      log.error(this.service, error);
+      throw new Error(error);
+    }
   }
 }

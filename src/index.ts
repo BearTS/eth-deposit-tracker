@@ -7,6 +7,7 @@ import MongoDatabase from "./providers/mongoDB";
 import logger from "./providers/logger";
 import Express from "./apps/api";
 
+// TODO: microservice with ethProvider being used as a standalone node service to communicate with the blockchain and golang for the rest of the app with goroutines for concurrency
 async function startApplication() {
   logger.info("Application", "Starting the application");
   try {

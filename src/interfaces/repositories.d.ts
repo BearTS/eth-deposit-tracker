@@ -5,4 +5,5 @@ export interface IDepositsRepository {
   findById(id: string): Promise<Deposit | null>;
   getAll(blockTimestamp?: number): Promise<Deposit[]>;
   getLastStoredDeposit(): Promise<Deposit | null>;
+  getAllPaginated(page: number, limit: number): Promise<Deposit[]>;
 }

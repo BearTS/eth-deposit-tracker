@@ -1,6 +1,5 @@
 {
   "dashboard": {
-    "id": null,
     "title": "Deposit Dashboard",
     "uid": "deposit-dashboard",
     "timezone": "browser",

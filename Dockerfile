@@ -5,7 +5,8 @@ COPY package.json /app/
 COPY yarn.lock /app/
 
 RUN yarn install
-COPY . /app/
+COPY src /app/src
+COPY tsconfig.json /app/
 
 RUN yarn build
 

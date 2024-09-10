@@ -12,7 +12,6 @@ interface ITelegramConfig {
 }
 
 // TODO: Rate limit fix, could maintain a message queue?
-// TODO: Maybe its better to convert the whole app into a microservice, with ethProvider being used as a standalone service in ts to communicate with the blockchain and golang for the rest of the app with goroutines for concurrency
 /**
  * @class Telegram
  * @description This class is used to send notifications to Telegram
