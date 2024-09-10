@@ -78,7 +78,7 @@ export class DepositsTracker implements IDepositTracker {
       const batch = [];
       for (const tx of txns) {
         if (this.from.length && !this.from.includes(tx.from)) {
-          this.log.info(
+          this.log.debug(
             this.service,
             `Ignoring transaction ${tx.hash} from ${tx.from}`,
           );
@@ -86,7 +86,7 @@ export class DepositsTracker implements IDepositTracker {
         }
 
         if (this.to.length && !this.to.includes(tx.to)) {
-          this.log.info(
+          this.log.debug(
             this.service,
             `Ignoring transaction ${tx.hash} to ${tx.to}`,
           );

@@ -79,14 +79,14 @@ export class EthereumProvider {
     const block = await this.getBlock(blockNumber);
 
     if (!block || !block.transactions.length) {
-      this.log.info(
+      this.log.debug(
         this.service,
         `No transactions found in block ${blockNumber}`,
       );
       return null;
     }
 
-    this.log.info(
+    this.log.debug(
       this.service,
       `Processing block ${blockNumber} with ${block.transactions.length} transactions`,
     );
