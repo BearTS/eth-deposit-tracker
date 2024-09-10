@@ -28,13 +28,11 @@ class Log implements ILog {
       ],
     });
 
-    if (process.env.NODE_ENV !== "production") {
-      this.logger.add(
-        new transports.Console({
-          format: format.simple(),
-        }),
-      );
-    }
+    this.logger.add(
+      new transports.Console({
+        format: format.simple(),
+      }),
+    );
   }
 
   /**

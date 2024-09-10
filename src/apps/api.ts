@@ -2,11 +2,18 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import http from "http";
-import { ILog } from "../interfaces/log";
+import hpp from "hpp";
+import helmet from "helmet";
+
 import config from "../config";
 import compression from "compression";
-import helmet from "helmet";
-import hpp from "hpp";
+import { DepositsTracker } from "./tracker";
+
+import { ILog } from "../interfaces/log";
+import { IDepositTracker } from "../interfaces/depositTracker";
+import { IDepositsRepository } from "../interfaces/repositories";
+import { IEthProvider } from "../interfaces/ethProvider";
+import { INotify } from "../interfaces/notify";
 
 dotenv.config();
 
@@ -14,19 +21,43 @@ dotenv.config();
  * @class Express
  * @description This class is used to initialize the express server
  */
-class Express {
+export default class Express {
   public express: express.Application;
   private server: http.Server;
   private log: ILog;
   private service: string = "Express";
+  private depositTracker: IDepositTracker | null;
+  private depositRepo: IDepositsRepository;
+  private notify: INotify;
 
   /**
    * @constructor
    * @description This function is used to initialize the express server
    * @returns void
    */
-  constructor() {
+  constructor(
+    log: ILog,
+    depositRepo: IDepositsRepository,
+    notify: INotify,
+    ethProvider?: IEthProvider,
+  ) {
+    this.log = log;
+    this.notify = notify;
+    this.depositRepo = depositRepo;
     this.express = express();
+    if (ethProvider) {
+      let from: string[] = [];
+      if (config.FROM_ADDRESS) {
+        from = config.FROM_ADDRESS.split(",");
+      }
+      this.depositTracker = new DepositsTracker(
+        this.notify,
+        this.log,
+        ethProvider,
+        this.depositRepo,
+        from,
+      );
+    }
     this.createServer();
     this.mountMiddlewares();
   }
@@ -37,8 +68,10 @@ class Express {
    * @returns void
    */
   public init(): void {
+    if (this.depositTracker) {
+      this.depositTracker.startNewBlocksListener();
+    }
     const port = config.PORT;
-
     // for 404 handler
     this.express.use((req, res) => {
       res.status(404).json({
@@ -71,5 +104,3 @@ class Express {
     this.server = http.createServer(this.express);
   }
 }
-
-export default new Express();

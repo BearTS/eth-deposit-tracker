@@ -12,20 +12,29 @@ services:
       - MONGODB_USERNAME=user
       - MONGODB_PASSWORD=password
       - MONGODB_DATABASE=deposits
+    networks:
+      - default
 
   app:
     build: .
     container_name: app
+    ports:
+      - "3000:3000"
     depends_on:
       - mongodb
     environment:
-      - MONGODB_URI=mongodb://user:password@mongodb:27017/deposits
+      - MONGO_URI=mongodb://user:password@mongodb:27017/deposits
       - PORT=3000
       - NODE_ENV=production
     volumes:
       - ./logs:/app/logs
     env_file:
       - .env
+    networks:
+      - default
 
+networks:
+  default:
+  
 volumes:
   mongodb_data:

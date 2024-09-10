@@ -1,11 +1,12 @@
 import { INotify } from "../interfaces/notify.d";
 import { IDepositsRepository } from "../interfaces/repositories";
+import { IDepositTracker } from "../interfaces/depositTracker";
 import { IEthProvider } from "../interfaces/ethProvider";
 import { ILog } from "../interfaces/log";
 import { TransactionResponse, Block } from "ethers";
 import { Deposit, DepositSchema } from "../schemas/deposit";
 
-export class DepositsTracker {
+export class DepositsTracker implements IDepositTracker {
   private notifier: INotify;
   private depositRepo: IDepositsRepository;
   private ethProvider: IEthProvider;

@@ -1,21 +1,17 @@
 import { EthereumProvider } from "./providers/ethProvider";
 import config from "./config";
-import { DepositsTracker } from "./apps/tracker";
 import { Telegram } from "./providers/telegram";
 import { DepositRepository } from "./repositories/depositRepository";
 import { DepositModel } from "./models/deposit";
 import MongoDatabase from "./providers/mongoDB";
 import logger from "./providers/logger";
+import Express from "./apps/api";
 
 async function startApplication() {
-  let from: string[] = [];
-  if (config.FROM_ADDRESS) {
-    from = config.FROM_ADDRESS.split(",");
-  }
   logger.info("Application", "Starting the application");
   try {
     // Initialize Telegram notifier
-    const notify = new Telegram(
+    const telegramNotifier = new Telegram(
       {
         token: config.TELEGRAM_BOT_TOKEN,
         chatId: config.TELEGRAM_CHAT_ID,
@@ -25,7 +21,7 @@ async function startApplication() {
 
     // Initialize MongoDB
     const db = new MongoDatabase({ uri: config.MONGO_URI }, logger);
-    await db.init();
+    db.init();
     const depositRepo = new DepositRepository(DepositModel);
 
     // Initialize Ethereum provider
@@ -35,16 +31,13 @@ async function startApplication() {
     );
 
     // Setup the deposit tracker
-    const deposTracker = new DepositsTracker(
-      notify,
+    const express = new Express(
       logger,
-      ethProvider,
       depositRepo,
-      from,
+      telegramNotifier,
+      ethProvider,
     );
-
-    // Start listening for new blocks
-    await deposTracker.startNewBlocksListener();
+    await express.init();
   } catch (err) {
     logger.error("Application", `Failed to start application: ${err.message}`);
     process.exit(1); // Exit the process with an error code
