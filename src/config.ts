@@ -14,6 +14,7 @@ const config = {
 
   // Ethereum configuration
   RPC_URL: process.env.RPC_URL!,
+  FROM_ADDRESS: process.env.FROM_ADDRESS!,
 };
 
 export default config;

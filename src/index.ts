@@ -21,11 +21,14 @@ const notify = new Telegram(
   logger,
 );
 
+const from = config.FROM_ADDRESS.split(",");
+
 const depositRepo = new DepositRepository(DepositModel);
 const deposTracker = new DepositsTracker(
   notify,
   logger,
   ethProvider,
   depositRepo,
+  from,
 );
 deposTracker.startNewBlocksListener();
