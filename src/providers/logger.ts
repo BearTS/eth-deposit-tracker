@@ -1,6 +1,6 @@
 import { createLogger, format, transports } from "winston";
 import type { Logger } from "winston";
-import { ILog } from "../types/log"
+import { ILog } from "../types/log";
 
 /**
  * @class Log
@@ -20,7 +20,7 @@ class Log implements ILog {
         format.errors({ stack: true }),
         format.json(),
         format.prettyPrint(),
-        format.colorize()
+        format.colorize(),
       ),
       transports: [
         new transports.File({ filename: "logs/error.log", level: "error" }),
@@ -32,7 +32,7 @@ class Log implements ILog {
       this.logger.add(
         new transports.Console({
           format: format.simple(),
-        })
+        }),
       );
     }
   }

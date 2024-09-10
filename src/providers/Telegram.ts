@@ -7,8 +7,8 @@ import { ILog } from "../types/log";
  * @description Interface for Telegram Configuration
  */
 interface ITelegramConfig {
-    token: string;
-    chatId: string;
+  token: string;
+  chatId: string;
 }
 
 /**
@@ -32,7 +32,10 @@ export class Telegram implements INotify {
     try {
       if (message.length > this.MaxCharacters) {
         const chunks = this.splitMessage(message, this.MaxCharacters);
-        this.log.info(this.service, `Message too long, splitting into ${chunks.length} chunks`);
+        this.log.info(
+          this.service,
+          `Message too long, splitting into ${chunks.length} chunks`,
+        );
         for (const chunk of chunks) {
           let msg = `[${service}] ${chunk}`;
           await this.client.telegram.sendMessage(this.service, msg);
@@ -48,28 +51,27 @@ export class Telegram implements INotify {
   }
 
   /**
-  * Splits a message into chunks of a maximum length.
-  * @param message - The message to be split.
-  * @param maxCharacters - The maximum length of each chunk.
-  * @returns An array of message chunks.
-  */
+   * Splits a message into chunks of a maximum length.
+   * @param message - The message to be split.
+   * @param maxCharacters - The maximum length of each chunk.
+   * @returns An array of message chunks.
+   */
   private splitMessage(message: string, maxCharacters: number): string[] {
-     // Validate input
-     if (maxCharacters <= 0) {
-         throw new Error("maxCharacters must be greater than 0");
-     }
-     
-     // If message length is less than or equal to maxCharacters, no need to split
-     if (message.length <= maxCharacters) {
-         return [message];
-     }
-     
-     const chunks: string[] = [];
-     for (let i = 0; i < message.length; i += maxCharacters) {
-         chunks.push(message.slice(i, i + maxCharacters));
-     }
-     
-     return chunks;
- }
- 
+    // Validate input
+    if (maxCharacters <= 0) {
+      throw new Error("maxCharacters must be greater than 0");
+    }
+
+    // If message length is less than or equal to maxCharacters, no need to split
+    if (message.length <= maxCharacters) {
+      return [message];
+    }
+
+    const chunks: string[] = [];
+    for (let i = 0; i < message.length; i += maxCharacters) {
+      chunks.push(message.slice(i, i + maxCharacters));
+    }
+
+    return chunks;
+  }
 }

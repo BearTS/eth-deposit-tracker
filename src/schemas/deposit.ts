@@ -10,12 +10,12 @@ import { z } from "zod";
  * @description Deposit Schema
  */
 export const DepositSchema = z.object({
-    blockNumber: z.number(),
-    blockTimestamp: z.number(),
-    fee: z.bigint().optional(),
-    hash: z.string().optional(),
-    pubkey: z.string()
+  blockNumber: z.number(),
+  blockTimestamp: z.number(),
+  fee: z.bigint().optional(),
+  hash: z.string().optional(),
+  pubkey: z.string(),
 });
-    
+
 // Deposit type
 export type Deposit = z.infer<typeof DepositSchema>;
