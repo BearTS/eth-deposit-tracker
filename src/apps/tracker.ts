@@ -45,6 +45,7 @@ export class DepositsTracker {
      * @description This function is used to process a block
      * @param blockNumber block number
      */
+    // TODO: Implement Batch Processing
     public async processBlock(blockNumber: number): Promise<void> {
         try {
             const txns = await this.ethProvider.getBlockTransactions(blockNumber);

@@ -3,8 +3,9 @@ dotenv.config()
 
 // Configuration for the app, taken from the environment variables
 const config = {
-    MONGO_URI: process.env.MONGO_URI || "mongodb://user:password@localhost:27017/deposits",
     PORT: process.env.PORT || 3000,
+    
+    MONGO_URI: process.env.MONGO_URI || "mongodb://user:password@localhost:27017/deposits",
 
     // Telegram bot configuration
     TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN!,

@@ -13,5 +13,19 @@ services:
       - MONGODB_PASSWORD=password
       - MONGODB_DATABASE=deposits
 
+  app:
+    build: .
+    container_name: app
+    depends_on:
+      - mongodb
+    environment:
+      - MONGODB_URI=mongodb://user:password@mongodb:27017/deposits
+      - PORT=3000
+      - NODE_ENV=production
+    volumes:
+      - ./logs:/app/logs
+    env_file:
+      - .env
+
 volumes:
   mongodb_data:

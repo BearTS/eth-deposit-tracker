@@ -1,4 +1,4 @@
-FROM node:alpine  as builder
+FROM node:lts-alpine AS builder
 WORKDIR /app/
 
 COPY package.json /app/
@@ -9,14 +9,13 @@ COPY . /app/
 
 RUN yarn build
 
-FROM node:alpine
+FROM node:lts-alpine
 ENV NODE_ENV=production
-
 WORKDIR /app/
 
-COPY --from=builder /usr/src/dist/ /app/
 COPY package.json /app/
 COPY yarn.lock /app/
-
 RUN yarn install --production
+
+COPY --from=builder /app/dist /app/
 CMD ["node", "index.js"]

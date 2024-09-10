@@ -7,6 +7,7 @@ import { DepositModel } from "./models/deposit";
 import MongoDatabase from "./providers/mongoDB";
 import logger from "./providers/logger";
 
+logger.info("Application", "Starting the application");
 const mongo = new MongoDatabase({ uri: config.MONGO_URI }, logger);
 mongo.init();
 
