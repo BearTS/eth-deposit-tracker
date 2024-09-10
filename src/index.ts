@@ -8,7 +8,7 @@ import MongoDatabase from "./providers/mongoDB";
 import logger from "./providers/logger";
 
 async function startApplication() {
-  let from: string = [];
+  let from: string[] = [];
   if (config.FROM_ADDRESS) {
     from = config.FROM_ADDRESS.split(",");
   }
