@@ -122,7 +122,6 @@ The logs are saved in the `logs` folder.
 The frontend is built with Next.js and is responsible for:
 
 - Displaying real-time deposits.
-- Showing metrics using Grafana.
 - Presenting deposits in a paginated and table format, using v0.dev.
 
 ## Future Improvements
