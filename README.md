@@ -3,7 +3,7 @@
 **Ethereum Real-Time Tracking**. This project is a hiring task for Luganodes.
 Deployed links are:
 - App: https://mm.bearts.us.kg
-- Graphana: https://plane.bearts.us.kg/d/fdxi053c3c0e8b/dashboard?orgId=1 
+- Graphana: https://plane.bearts.us.kg/d/fdxi053c3c0e8b/dashboard?orgId=1&from=now-6h&to=now 
    Username: admin
    password: admin
 
