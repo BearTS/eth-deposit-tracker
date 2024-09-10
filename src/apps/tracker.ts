@@ -48,21 +48,38 @@ export class DepositsTracker implements IDepositTracker {
   }
 
   /**
-   * @method startNewBlocksListener
-   * @description This function is used to start listening for new blocks
+   * @method startNewListener
+   * @description This function is used to start listening for new contracts
    * @returns void
    */
-  public startNewBlocksListener(): void {
-    this.ethProvider.watchNewBlocks(async (blockNumber: number) => {
-      try {
-        await this.processBlock(blockNumber);
-      } catch (error) {
-        this.log.error(
-          this.service + "[startNewBlocksListener]",
-          new Error(`Error processing block ${blockNumber}: ${error.message}`),
-        );
-      }
-    });
+  public startNewListener(): void {
+    this.ethProvider.watchContractEvents(
+      async (
+        pubkey: any,
+        withdrawal_credentials: any,
+        amount: any,
+        signature: any,
+        index: any,
+        event: any,
+      ) => {
+        try {
+          // await this.processBlock(blockNumber);
+          this.log.info(
+            this.service,
+            `Processing event ${event} from ${pubkey} with amount ${amount} withdrawal_credentials ${withdrawal_credentials} signature ${signature} index ${index}`,
+          );
+          const blockNumber = await this.ethProvider
+            .getProvider()
+            .getBlockNumber();
+          await this.processBlock(blockNumber);
+        } catch (error) {
+          this.log.error(
+            this.service + "[startNewListener]",
+            new Error(`Error processing contract: ${error.message}`),
+          );
+        }
+      },
+    );
   }
 
   /**

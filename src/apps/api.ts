@@ -76,7 +76,7 @@ export default class Express {
    */
   public init(): void {
     if (this.depositTracker) {
-      this.depositTracker.startNewBlocksListener();
+      this.depositTracker.startNewListener();
     }
     const port = config.PORT;
     // for 404 handler
