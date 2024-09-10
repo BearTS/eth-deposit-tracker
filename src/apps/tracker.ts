@@ -28,7 +28,7 @@ export class DepositsTracker implements IDepositTracker {
     if (from) this.from = from;
 
     if (this.from.length) {
-      this.log.info(
+      this.log.debug(
         this.service,
         `Starting Deposits Tracker for the following addresses: ${this.from.join(", ")}`,
       );
@@ -61,7 +61,6 @@ export class DepositsTracker implements IDepositTracker {
    * @description This function is used to process a block
    * @param blockNumber block number
    */
-  // TODO: Implement Batch Processing
   public async processBlock(blockNumber: number): Promise<void> {
     try {
       const txns = await this.ethProvider.getBlockTransactions(blockNumber);
@@ -102,11 +101,19 @@ export class DepositsTracker implements IDepositTracker {
     block: Block,
   ): Promise<void> {
     let msg = `Processing batch of ${batch.length} transactions`;
+    this.log.debug(this.service, msg);
+    const transactionsSavePromises = [];
+
     for (const tx of batch) {
-      msg += `\nSuccessfully processed transaction ${tx.hash} from ${tx.from} with fee ${tx.gasPrice * tx.gasPrice}`;
-      await this.saveTransaction(tx, block);
+      const log = `\nSuccessfully processed transaction ${tx.hash} from ${tx.from} with fee ${tx.gasPrice * tx.gasPrice}`;
+      transactionsSavePromises.push(this.saveTransaction(tx, block));
+      msg += log;
+      this.log.debug(this.service, log);
     }
-    await this.notifier.notify(this.service, msg);
+
+    await Promise.all(transactionsSavePromises);
+
+    await Promise.all([this.notifier.notify(this.service, msg)]);
   }
 
   /**
@@ -128,6 +135,10 @@ export class DepositsTracker implements IDepositTracker {
         fee: tx.gasPrice * tx.gasPrice,
       };
       DepositSchema.parse(depositRecord);
+      this.log.debug(
+        this.service,
+        `Saving transaction ${tx.hash} to the database`,
+      );
 
       await this.depositRepo.create(depositRecord);
     } catch (err: any) {

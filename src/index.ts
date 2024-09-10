@@ -1,6 +1,6 @@
 import { EthereumProvider } from "./providers/ethProvider";
 import config from "./config";
-import { Telegram } from "./providers/telegram";
+import { Telegram } from "./providers/Telegram";
 import { DepositRepository } from "./repositories/depositRepository";
 import { DepositModel } from "./models/deposit";
 import MongoDatabase from "./providers/mongoDB";
@@ -30,7 +30,8 @@ async function startApplication() {
       logger,
     );
 
-    // Setup the deposit tracker
+    // Setup the deposit tracker api
+    // TODO: Extend the api for frontend app?
     const express = new Express(
       logger,
       depositRepo,

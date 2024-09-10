@@ -10,9 +10,9 @@ import { ILog } from "../interfaces/log";
 class Log implements ILog {
   private readonly logger: Logger;
 
-  constructor() {
+  constructor(level: string = "info") {
     this.logger = createLogger({
-      level: "info",
+      level: level,
       format: format.combine(
         format.timestamp({
           format: "YYYY-MM-DD HH:mm:ss",
@@ -55,6 +55,16 @@ class Log implements ILog {
   public error(service: string, error: any) {
     error = `[${service}] ${error}`;
     this.logger.error(error);
+  }
+
+  /**
+   * @method debug
+   * @description Log debug messages
+   * @param {string} message
+   */
+  public debug(service: string, message: string) {
+    message = `[${service}] ${message}`;
+    this.logger.debug(message);
   }
 }
 
